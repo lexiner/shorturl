@@ -39,6 +39,7 @@ func (s *ShortService) GetShortUrl(code string) (string, error) {
 		number := one.Count + 1
 		q, link := gplus.NewQuery[models.Shorturl]()
 		q.Eq(&link.Id, id).Set(&link.Count, number)
+
 		gplus.Update(q)
 
 		return one.Url, nil
@@ -53,10 +54,8 @@ func (s *ShortService) CreateShortUrl(longUrl string) (string, error) {
 
 	query, u := gplus.NewQuery[models.Shorturl]()
 	query.Eq(&u.Sha1, fmt.Sprintf("%x", hash))
-	one, resultDb := gplus.SelectOne(query)
-	if resultDb.Error != nil {
-		return "当前数据库查询异常", resultDb.Error
-	}
+	one, _ := gplus.SelectOne(query)
+
 	sq, error := sqids.New(sqids.Options{
 		MinLength: 6,
 	})
